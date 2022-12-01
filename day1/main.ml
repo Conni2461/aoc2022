@@ -1,32 +1,16 @@
 open Printf
 
-let ex1 filename =
-  let count = ref 0 in
-  let max = ref 0 in
-  let chan = open_in filename in
-  try
-    while true do
-      let line = input_line chan in
-      count :=
-        if line <> "" then !count + int_of_string line
-        else (
-          if !count > !max then max := !count;
-          0)
-    done
-  with End_of_file ->
-    close_in chan;
-    if !count > !max then max := !count;
-    print_endline (string_of_int !max)
+let max_number_list lst = List.fold_left max 0 lst
 
-let rec sum_largest_inner l n acc =
+let rec sum_largest_inner lst n acc =
   match n with
   | 0 -> acc
   | x -> (
-    match l with
+    match lst with
     | [] -> 0
     | h :: t -> sum_largest_inner t (x - 1) (h + acc))
 
-let ex2 filename =
+let max_list filename =
   let count = ref 0 in
   let max_nums = ref [] in
   let chan = open_in filename in
@@ -38,14 +22,23 @@ let ex2 filename =
         else (
           max_nums := !count :: !max_nums;
           0)
-    done
+    done;
+    !max_nums
   with End_of_file ->
     close_in chan;
     max_nums := !count :: !max_nums;
-    let z = List.sort compare !max_nums in
-    print_int (sum_largest_inner (List.rev z) 3 0)
+    !max_nums
+
+let ex1 filename = max_number_list (max_list filename)
+
+let ex2 filename =
+  let z = List.sort compare (max_list filename) in
+  sum_largest_inner (List.rev z) 3 0
 ;;
 
-ex1 "day1/input1.txt";;
+let r = ex1 "day1/input1.txt" in
+printf "%d\n" r
+;;
 
-ex2 "day1/input1.txt"
+let r = ex2 "day1/input1.txt" in
+printf "%d\n" r
